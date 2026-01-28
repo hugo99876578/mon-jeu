@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Projet</title>
+<style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #ffffff;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+ 
+    #game {
+      position: relative;
+      width: 400px;
+      height: 600px;
+      background-color: #000000;
+      overflow: hidden;
+      border: 2px solid #000;
+    }
+ 
+    #player {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: rgb(32, 138, 208);
+      bottom: 10px;
+      left: 180px;
+    }
+ 
+    .obstacle {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: rgb(255, 93, 12);
+      top: 0;
+    }
+ 
+    #score {
+      color: #000;
+      margin-top: 10px;
+      font-size: 20px;
+    }
+</style>
+</head>
+<body>
+ 
+  <div>
+<div id="game">
+<div id="player"></div>
+</div>
+<div id="score">Score : 0</div>
+</div>
+ 
+  <script>
+    const player = document.getElementById('player');
+    const game = document.getElementById('game');
+    const scoreDisplay = document.getElementById('score');
+ 
+    let playerPos = 180; // position horizontale
+    let score = 0;
+    let obstacles = [];
+    let gameOver = false;
+ 
+    // Déplacer le joueur
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') {
+        playerPos -= 20;
+        if (playerPos < 0) playerPos = 0;
+      }
+      if (e.key === 'ArrowRight') {
+        playerPos += 20;
+        if (playerPos > 360) playerPos = 360; // 400 - 40
+      }
+      player.style.left = playerPos + 'px';
+    });
+ 
+    // Créer un obstacle
+    function createObstacle() {
+      if (gameOver) return;
+      const obs = document.createElement('div');
+      obs.classList.add('obstacle');
+      obs.style.left = Math.floor(Math.random() * 10) * 40 + 'px';
+      obs.style.top = '0px';
+      game.appendChild(obs);
+      obstacles.push(obs);
+    }
+ 
+    // Déplacer les obstacles
+    function moveObstacles() {
+      if (gameOver) return;
+      obstacles.forEach((obs, index) => {
+        let top = parseInt(obs.style.top);
+        obs.style.top = top + 5 + 'px';
+ 
+        // Collision
+        if (
+          top + 40 >= 550 && // hauteur joueur
+          parseInt(obs.style.left) === playerPos
+        ) {
+          alert('Game Over ! Score : ' + score);
+          gameOver = true;
+          location.reload();
+        }
+ 
+        // Supprimer obstacle hors écran
+        if (top > 600) {
+          game.removeChild(obs);
+          obstacles.splice(index, 1);
+          score++;
+          scoreDisplay.textContent = 'Score : ' + score;
+        }
+      });
+    }
+ 
+    // Boucle du jeu
+    setInterval(moveObstacles, 50);
+    setInterval(createObstacle, 1000);
+</script>
+ 
+</body>
+</html>
